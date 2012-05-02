@@ -20,4 +20,17 @@ class Homologue:
                     columns[i][letter]['records'] = []
                 columns[i][letter]['count'] += 1
                 columns[i][letter]['records'] += record
-        
+    def get_possible_coalesence_sites(self):
+        '''Filters out columns/amino-acids that have either too much variation or no variation'''
+        cols = []
+        for column in self.columns:
+            if len(column)/len(columns) < MAX_VARIATION_RATIO and len(column) > 1:
+                cols += column
+        return cols
+    def compare(self, other):
+        colsA = self.get_possible_coalesence_sites()
+        colsB = other.get_possible_coalesence_sites()
+        for colA in colsA:
+           for letter in colA:
+               
+            
