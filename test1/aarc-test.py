@@ -13,16 +13,17 @@ def seq_column_check(seqA, seqApos, column, colBpos, colSize):
                 if column[letter]['records'][seqB].id == seqA.id:
                     ret = {}
                     ret['colApos'] = seqApos # basically X cord for A
-                    ret['recordA'] = seqA.id # Which read it came from (Y cord for A)
+                    ret['recordA'] = seqA.id.replace("|","")# Which read it came from (Y cord for A)
                     ret['colBpos'] = colBpos # X cord for B
-                    ret['recordB'] = column[letter]['records'][seqB].id # Y cord for B (which read it came from)
-                    tuples += ret
+                    ret['recordB'] = column[letter]['records'][seqB].id.replace("|","") # Y cord for B (which read it came from)
+                    tuples.append(ret)
     return tuples
 
 def seq_columns_check(seq, seqPos, columns):
     tuples = []
     col_pos = 0;
     for column in columns:
+        #TODO: fix this, col_pos does not correspond to real column pos
         tuples += seq_column_check(seq, seqPos, column, col_pos, len(columns))
         col_pos += 1
     return tuples
@@ -42,8 +43,8 @@ def column_columns_check(colA, colApos, colAlen, colsB):
 
 
 def columns_columns_check(A, B):
-    colsA = A.get_possible_cols()
-    colsB = B.get_possible_cols()
+    (colsA, colAmap) = A.get_possible_cols()
+    (colsB, colBmap) = B.get_possible_cols()
     tuples = []
     col_pos = 0
     # Each item in colsA represents a set of mutations
@@ -53,8 +54,18 @@ def columns_columns_check(A, B):
             col_length += mutations[letter]['count']
         tuples += column_columns_check(mutations, col_pos, col_length, colsB)
         col_pos += 1
+    for element in tuples:
+        element['colApos'] = colAmap[element['colApos']]
+        element['colBpos'] = colBmap[element['colBpos']]
     return tuples
-            
+
+def filter_column(col, col_height):
+    if "-" in col: #Filter out columns where there is an insertion in only a few homologues
+        if float(col["-"]["count"])/float(col_height) < LETTER_UNIQUENESS_WEIGHT:
+            return False
+    if not float(len(col))/float(col_height) < MAX_VARIATION_RATIO and len(col) > 1:
+        return False 
+    return True
 class Homologue:
     '''A class to store all homologues'''
     def __init__(self, filename, fileFormat):
@@ -75,22 +86,31 @@ class Homologue:
                 columns[i][letter]['records'][record.id] = record 
                 i += 1
     def get_possible_cols(self):
-        '''Filters out columns/amino-acids that have either too much variation or no variation'''
+        '''Filters out columns/amino-acids that have either too much variation or no variation
+        Returns a list of the columns along with a list containing the map of the columns to
+        their original positions'''
         cols = []
         col_len = len(self.columns)
+        i = 0;
+        column_map = []
         for column in self.columns:
-            if float(len(column))/float(self.col_height) < MAX_VARIATION_RATIO and len(column) > 1:
+            if filter_column(column,col_len):
                 cols.append(column)
-        return cols
+                column_map.append(i) # column_map[i] = original position of column in colum.self
+            i += 1
+        return (cols, column_map)
 
 
 
-A = Homologue('rhoa-aligned.fa', 'fasta')
-B = Homologue('rock-aligned.fa', 'fasta')
-print len(A.columns)
-print len(B.columns)
-print len(A.columns) * len(B.columns)
-print len(B.get_possible_cols()) * len(A.get_possible_cols())
+
+    
+A = Homologue('rhoa-aligned-no-predicted.fa', 'fasta')
+B = Homologue('rock-aligned-no-predicted.fa', 'fasta')
+print len(A.get_possible_cols()[1])
+print len(B.get_possible_cols()[1])
+print len(B.get_possible_cols()[1]) * len(A.get_possible_cols()[1])
 #for i in range(0,100):
 #    columns_columns_check(A,B)
 print len(columns_columns_check(A,B))
+#for element in columns_columns_check(A,B):
+#    print element
