@@ -37,7 +37,7 @@ def seqs_columns_check(seqs, seqsPos, columns):
 def column_columns_check(colA, colApos, colAlen, colsB):
     tuples = []
     for letter in colA:
-        if float(colA[letter]['count'])/float(colAlen) < LETTER_UNIQUENESS_WEIGHT and len(colA) > 1:
+        if (float(colA[letter]['count'])/float(colAlen) < LETTER_UNIQUENESS_WEIGHT) and (len(colA) > 1):
             tuples += seqs_columns_check(colA[letter]['records'], colApos,colsB)
     return tuples
 
@@ -63,7 +63,7 @@ def filter_column(col, col_height):
     if "-" in col: #Filter out columns where there is an insertion in only a few homologues
         if float(col["-"]["count"])/float(col_height) < LETTER_UNIQUENESS_WEIGHT:
             return False
-    if not float(len(col))/float(col_height) < MAX_VARIATION_RATIO and len(col) > 1:
+    if not (float(len(col))/float(col_height) < MAX_VARIATION_RATIO and len(col) > 1):
         return False 
     return True
 class Homologue:
@@ -100,17 +100,16 @@ class Homologue:
             i += 1
         return (cols, column_map)
 
-
-
-
     
 A = Homologue('rhoa-aligned-no-predicted.fa', 'fasta')
 B = Homologue('rock-aligned-no-predicted.fa', 'fasta')
-print len(A.get_possible_cols()[1])
-print len(B.get_possible_cols()[1])
-print len(B.get_possible_cols()[1]) * len(A.get_possible_cols()[1])
+print "Number of columns in A: ", len(A.columns)
+print "Number of columns in B: ", len(B.columns)
+print "Number of Possible columns in A: ", len(A.get_possible_cols()[1])
+print "Number of Possible columns in B: ", len(B.get_possible_cols()[1])
+print "Total Number of possible combinations: ", len(B.get_possible_cols()[1]) * len(A.get_possible_cols()[1])
 #for i in range(0,100):
-#    columns_columns_check(A,B)
+#   columns_columns_check(A,B)
 print len(columns_columns_check(A,B))
 #for element in columns_columns_check(A,B):
 #    print element
