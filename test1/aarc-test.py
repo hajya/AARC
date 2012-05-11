@@ -190,7 +190,11 @@ class jsonHomologue():
     '''Homologues represented by json lines'''
     def __init__(self, line):
         self.alignments = json.loads(line)
-        #TODO: check to make alignments have the same length
+        #check to make sure alignments are same length
+        #Other sanity checks should go here
+        for alignment in self.alignments:
+            if len(alignment) != len(self.alignments[0]):
+                raise Exception("Length of alignments didn't match")
         self.columns = []
         columns = self.columns
         self.filtered_columns = []
