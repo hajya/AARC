@@ -1,8 +1,50 @@
 from Bio import AlignIO
+from scoring import get_amino_acid_score
 
 #Maximum (number of letter variations in a col)/(total # of seq)
 MAX_VARIATION_RATIO = .3
 LETTER_UNIQUENESS_WEIGHT = .3 #(Number of occurences of letter)/(Total # of letters)
+
+
+def print_possible_tuple(tup):
+    print_str = "["
+    print_str += '\'A-Pos\': ' + str(tup['colApos']) + ', '
+    print_str += '\'B-Pos\': ' + str(tup['colBpos']) + ', '
+    print_str += '\'deltaAScore\': ' + str(tup['deltaAScore']) + ', '
+    print_str += '\'deltaBScore\': ' + str(tup['deltaBScore']) + ', '
+    print_str += '\'deltaMutationScore\':' + str(tup['deltaMutationScore']) + ']'
+    print print_str
+    
+def calc_mutation_score(column, letter):
+    '''Uses a scoring matrix to calculate a score based
+    upon what the amino acid changed from to'''
+    #Select the most common letter in the column
+    #As this will be what the letter mutated from
+    max_letter_count = 0
+    max_letter = ''
+    for letter in column:
+        if column[letter]['count'] > max_letter_count:
+            max_letter_count = column[letter]['count']
+            max_letter = letter
+    return get_amino_acid_score(max_letter, letter);
+
+def calc_delta_mutation_score(scoreA, scoreB):
+    '''Calculates the similarity between two amino acid scores
+    and assigns them a value. The theory is that the more similar
+    the changes in the amino acids the more likely it is to be a
+    covariance'''
+    #Score is 1/(.1 + abs(delta(a,b)))
+    #.1 is to prevent diviide by zero
+    #highest possible score is 10 and increases more rapidly
+    #as the distance approaches 0
+    return float(1.0/(0.1 + abs(float(scoreA) - float(scoreB))))
+
+def calc_mutation_count_score(column, letter):
+    '''Uses the number of mutations in a column to get
+    a score for the variation in the column and how unique
+    a given letter is'''
+    #TODO: finish this not sure quite how to score this
+    return 0
 
 def is_mutation(column, letter, colHeight):
     '''Checks to see if a given letter is a mutation within a column'''
@@ -20,53 +62,63 @@ def letter_contains_record(column, letter, record):
             return column[letter]['records'][recordB]
     return False
 
-def seq_column_combine(seqA, seqApos, column, colBpos, colHeight):
+def seq_column_combine(seq_a, seq_a_pos, b_col, col_b_pos, A, B):
     '''Checks to see if the sequence given by seqA, with amino acid at position
     seqApos has a mutation in column, with column position (index) colBpos for a
     given number of variations (colHeight)'''
+    colHeight = A.col_height
     tuples = []
-    for letter in column:
+    for b_letter in b_col:
         #If the given letter is a mutation
-        if is_mutation(column, letter, colHeight):
+        if is_mutation(b_col, b_letter, colHeight):
             #Check the records of that letter
-            seqB = letter_contains_record(column, letter, seqA)
-            if seqB:
+            #To see if the sequence A is in it
+            seq_b = letter_contains_record(b_col, b_letter, seq_a)
+            #If so we have a match
+            if seq_b:
                 ret = {}
-                ret['colApos'] = seqApos # basically X cord for A
-                ret['recordA'] = seqA.id.replace("|","")# Which read it came from (Y cord for A)
-                ret['colBpos'] = colBpos # X cord for B
-                ret['recordB'] = seqB.id.replace("|","") # Y cord for B (which read it came from)
+                ret['colApos'] = seq_a_pos # basically X cord for A
+                ret['seqA'] = seq_a # Sequence from protien A
+                ret['colBpos'] = col_b_pos # X cord for B
+                ret['seqB'] = seq_b # Sequence from protien B
+                ret['seqID'] = seq_a.id #Id of the sequence
+                #Score for the Amino acid change in protien A
+                ret['deltaAScore'] = calc_mutation_score(A.filtered_columns[seq_a_pos], seq_a[seq_a_pos])
+                #Score for the Amino acid change in protien B
+                ret['deltaBScore'] = calc_mutation_score(b_col, b_letter);
+                ret['deltaMutationScore'] = calc_delta_mutation_score(ret['deltaAScore'], ret['deltaBScore'])
                 tuples.append(ret)
     #Quick checksum to make sure that this only returns one pair (optional)
     if len(tuples) > 1:
         print "ERROR: multiple tuples returned for a single amino acid pairing"
     return tuples
 
-def seq_columns_combine(seq, seqPos, columns, colHeight):
+def seq_columns_combine(seq_a, seq_a_pos, A, B):
     '''Takes in a given sequence at position seqPos (aka an amino acid) and finds all the pairs
     in columns where there is a mutation in a column in the same variation'''
+    colHeight = A.col_height
     tuples = []
-    col_pos = 0;
-    for column in columns:
-        tuples += seq_column_combine(seq, seqPos, column, col_pos, colHeight)
-        col_pos += 1
+    for b_col_pos, b_col in enumerate(B.filtered_columns):
+        tuples += seq_column_combine(seq_a, seq_a_pos, b_col, b_col_pos, A, B)
     return tuples
 
-def seqs_columns_combine(seqs, seqsPos, columns, colHeight):
+def seqs_columns_combine(seqs_a, seqs_a_pos, A, B):
     '''Takes in a series of sequences (aka multiple mutation in a given column in an alignment)
     and creates a list of tuples where there was also a mutation in columns in the same variation'''
+    colHeight = A.col_height
     tuples = []
-    for seq in seqs:
-        tuples += seq_columns_combine(seqs[seq], seqsPos, columns, colHeight)
+    for seq_a in seqs_a:
+        tuples += seq_columns_combine(seqs_a[seq_a], seqs_a_pos, A, B)
     return tuples
 
-def column_columns_combine(colA, colApos, colsB, colHeight):
+def column_columns_combine(col_a, col_a_pos, A, B):
     '''takes in a given column and finds all mutations. This is then compared to columns (another protien)
     and all of the possible pairs of corresponding mutations are returned'''
+    colHeight = A.col_height
     tuples = []
-    for letter in colA:
-        if is_mutation(colA, letter, colHeight):
-            tuples += seqs_columns_combine(colA[letter]['records'], colApos,colsB, colHeight)
+    for letter in col_a:
+        if is_mutation(col_a, letter, colHeight):
+            tuples += seqs_columns_combine(col_a[letter]['records'], col_a_pos, A, B)
     return tuples
 
 
@@ -74,18 +126,16 @@ def columns_columns_combine(A, B):
     '''Takes in two homologues and finds all of the mutations in each. Then it takes all of the
     mutations in one variation (protien sequence) and returns each mutation paired with all of the
     mutations in the same variation (usually species) in the other protien.'''
-    (colsA, colAmap) = A.get_possible_cols()
-    (colsB, colBmap) = B.get_possible_cols()
+    (cols_a, col_a_map) = A.get_possible_cols()
+    (cols_b, col_b_map) = B.get_possible_cols()
     tuples = []
-    col_pos = 0
     # Each item in colsA represents a set of mutations
-    for mutations in colsA:
-        tuples += column_columns_combine(mutations, col_pos, colsB, A.col_height)
-        col_pos += 1
+    for col_a_pos, col_a in enumerate(cols_a):
+        tuples += column_columns_combine(col_a, col_a_pos, A, B)
     #Correct the column mapping since some columns were filtered out
     for element in tuples:
-        element['colApos'] = colAmap[element['colApos']]
-        element['colBpos'] = colBmap[element['colBpos']]
+        element['colApos'] = col_a_map[element['colApos']]
+        element['colBpos'] = col_b_map[element['colBpos']]
     return tuples
 
 def filter_column(col, col_height):
@@ -101,6 +151,7 @@ class Homologue:
     def __init__(self, filename, fileFormat):
         self.alignment = AlignIO.read(open(filename), fileFormat)
         self.columns = []
+        self.filtered_columns = []
         columns = self.columns
         self.col_height = len(self.alignment._records)
         for i in range(0, self.alignment.get_alignment_length()):
@@ -118,16 +169,17 @@ class Homologue:
     def get_possible_cols(self):
         '''Filters out columns/amino-acids that have either too much variation or no variation
         Returns a list of the columns along with a list containing the map of the columns to
-        their original positions'''
+        their original positions and sets the variable self.filtered_cols to the columns left over
+        from the fileter.'''
         cols = []
+        self.filtered_columns = []
         col_len = len(self.columns)
-        i = 0;
         column_map = []
-        for column in self.columns:
+        for i, column in enumerate(self.columns):
             if filter_column(column,col_len):
                 cols.append(column)
+                self.filtered_columns.append(column)
                 column_map.append(i) # column_map[i] = original position of column in colum.self
-            i += 1
         return (cols, column_map)
 
     
@@ -142,4 +194,4 @@ print "Total Number of possible combinations: ", len(B.get_possible_cols()[1]) *
 #   columns_columns_combine(A,B)
 print len(columns_columns_combine(A,B))
 for element in columns_columns_combine(A,B):
-    print element
+    print_possible_tuple(element)
