@@ -4,6 +4,7 @@ from scoring import get_amino_acid_score
 #Maximum (number of letter variations in a col)/(total # of seq)
 MAX_VARIATION_RATIO = .3
 LETTER_UNIQUENESS_WEIGHT = .3 #(Number of occurences of letter)/(Total # of letters)
+DELTA_MUTATION_SCORE_MINIMUM = .2
 
 
 def print_possible_tuple(tup):
@@ -182,7 +183,34 @@ class Homologue:
                 column_map.append(i) # column_map[i] = original position of column in colum.self
         return (cols, column_map)
 
-    
+def filter_results(results):
+    filtered_results = []
+    global DELTA_MUTATION_SCORE_MINIMUM
+    for element in results:
+        if element['deltaMutationScore'] < DELTA_MUTATION_SCORE_MINIMUM:
+            continue
+        else:
+            filtered_results.append(element)
+    return filtered_results
+
+def calc_total_delta_mutation(results):
+    i = 0.0
+    for element in results:
+        i += float(element['deltaMutationScore'])
+    return i
+
+def calc_and_print_average(results, column):
+    total = 0.0
+    for element in results:
+        total += float(element[column])
+    total = total/float(len(results))
+    print "Average " + column + ": " + str(total)
+    return total
+
+def print_averages(results):
+    for element in ['deltaAScore', 'deltaBScore', 'deltaMutationScore']:
+        calc_and_print_average(results, element)
+
 A = Homologue('rhoa-aligned-no-predicted.fa', 'fasta')
 B = Homologue('rock-aligned-no-predicted.fa', 'fasta')
 print "Number of columns in A: ", len(A.columns)
@@ -190,8 +218,20 @@ print "Number of columns in B: ", len(B.columns)
 print "Number of Possible columns in A: ", len(A.get_possible_cols()[1])
 print "Number of Possible columns in B: ", len(B.get_possible_cols()[1])
 print "Total Number of possible combinations: ", len(B.get_possible_cols()[1]) * len(A.get_possible_cols()[1])
+print "\n"
 #for i in range(0,100):
 #   columns_columns_combine(A,B)
-print len(columns_columns_combine(A,B))
-for element in columns_columns_combine(A,B):
-    print_possible_tuple(element)
+results = columns_columns_combine(A,B)
+print "Total Combinations found before filtration: ", len(results)
+print "Total Combinations deltaMutationScore: ", calc_total_delta_mutation(results)
+print "Averages Before filtration: "
+print_averages(results)
+print "\n"
+
+filtered_results = filter_results(results)
+print "Filtered Results combinations: ", len(filtered_results)
+print "Filtered Results deltaMutationScore: ", calc_total_delta_mutation(filtered_results)
+print "Averages After filtration: "
+print_averages(filtered_results)
+#for element in columns_columns_combine(A,B):
+#    print_possible_tuple(element)
