@@ -3,6 +3,7 @@ from scoring import get_amino_acid_score
 import pickle
 import sys
 import json
+import math
 #Maximum (number of letter variations in a col)/(total # of seq)
 MAX_VARIATION_RATIO = .3
 LETTER_UNIQUENESS_WEIGHT = .3 #(Number of occurences of letter)/(Total # of letters)
@@ -284,7 +285,7 @@ print "Filtered Results combinations: ", len(filtered_results)
 print "Filtered Results deltaMutationScore: ", calc_total_delta_mutation(filtered_results)
 print "Averages After filtration: "
 print_averages(filtered_results)
-#for element in filtered_results:
+#for element in results:
 #    print_possible_tuple(element)
 #for line in filtered_results:
 #    print json.dumps(line)
