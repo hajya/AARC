@@ -20,18 +20,18 @@ sed -i "s/USER/$USER/g" core-site.xml
 
 mkdir /tmp/$USER
 
-mkdir -p ~/.ssh
+#mkdir -p ~/.ssh
 
-pushd ~/.ssh
+#pushd ~/.ssh
 
-rm $HOME/.ssh/id_rsa_hadoop.pub
-rm $HOME/.ssh/id_rsa_hadoop
+#rm $HOME/.ssh/id_rsa_hadoop.pub
+#rm $HOME/.ssh/id_rsa_hadoop
 
-echo "id_rsa_hadoop" | ssh-keygen -t rsa -P ""
+#echo "id_rsa_hadoop" | ssh-keygen -t rsa -P ""
 
-cat $HOME/.ssh/id_rsa_hadoop.pub >> $HOME/.ssh/authorized_keys
+#cat $HOME/.ssh/id_rsa_hadoop.pub >> $HOME/.ssh/authorized_keys
 
-popd
+#popd
 
 ~/hadoop/bin/hadoop namenode -format
 

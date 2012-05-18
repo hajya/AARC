@@ -1,7 +1,7 @@
 #!/bin/bash
 
-HADOOP_PATH=~/hadoop/bin/hadoop
-HADOOP_STREAMING_PATH=~/hadoop/contrib/streaming/hadoop-*streaming*.jar 
+HADOOP_PATH=/data/hadoop/bin/bin/hadoop
+HADOOP_STREAMING_PATH=/data/hadoop/bin/contrib/streaming/hadoop-*streaming*.jar 
 
 
 MAPPER_FILE=./map.py
