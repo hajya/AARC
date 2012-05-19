@@ -13,12 +13,13 @@ prots = {}
 outfile = 'out.phy'
 formata = 'phylip'
 
-def make_uid(x):
-    def inc():
-        return x + 1
-    return inc
-
-UID = make_uid(-1)
+class unique_identifier:
+    def __init__(self, x):
+        self.count = x
+    def get_uid(self):
+        self.count += 1
+        return self.count
+UID = unique_identifier(-1)
 
 def makeXML(rec):
     #call to blast
@@ -40,7 +41,7 @@ def getHomologues(blast_records, searchQuery):
     '''Takes in a blast NCBIXML read and turns it into a
     homologue, returns a dictionary containing the following structure:
     {'searchQuery': <the function argument searchQuery>,
-     'protiens':{ 'species-1': [{'id':'species-1', 'seq':<protien-seq-1>, 'desc':<blast-desc-1>, 'uid': 1},
+     'species':{ 'species-1': [{'id':'species-1', 'seq':<protien-seq-1>, 'desc':<blast-desc-1>, 'uid': 1},
                                 {'id':'species-1', 'seq':<protien-seq-2>, 'desc':<blast-desc-2>, 'uid': 2},
                                ],
                   'species-2': [{'id':'species-2', 'seq':<protien-seq-3>, 'desc':<blast-desc-3>, 'uid': 3}
@@ -50,35 +51,37 @@ def getHomologues(blast_records, searchQuery):
     }'''
 
     global E_VAL_THRESHOLD
+    global UID
     homologue = {}
     homologue['searchQuery'] = searchQuery
-    homologue['protiens'] = {}
-    protiens = homologue['protiens']
+    homologue['species'] = {}
+    species = homologue['species']
     for alignment in blast_records.alignments:
         if len(alignment.hsps) != 1: #ERROR CONDITION
             print >> sys.stderr, "ERROR: unexpected blast results" 
             continue
         if alignment.hsps[0].expect > E_VAL_THRESHOLD:
             continue
-        species = re.findall("\[.*?\]", alignment.title)
-        species = set(species) # get only unique elements
-        if len(species) == 1:
-            species_name = list(species)[0]
-            if species_name not in protiens:
-                protiens[species_name] = []
-            species_protien_list = protiens[species_name]
+        species_results = re.findall("\[.*?\]", alignment.title)
+        species_set = set(species_results) # get only unique elements
+        if len(species_set) == 1:
+            species_name = list(species_set)[0]
+            if species_name not in species:
+                species[species_name] = []
+            species_protien_list = species[species_name]
             temp = {}
-            temp['uid'] = "FOO" #UID() 
-            temp['id'] = list(species)[0]
-            temp['description'] = "TEMP"#alignment.title
+            temp['uid'] = UID.get_uid() 
+            temp['id'] = species_name
+            temp['description'] = alignment.title
             temp['score'] = alignment.hsps[0].score
-            temp['seq'] = "TEMP" #alignment.hsps[0].sbjct
+            temp['seq'] = alignment.hsps[0].sbjct
             species_protien_list.append(temp)
     return homologue
 
 def align(homologue):
     '''Takes in a homologue from getHomologues() and
     aligns all of the sequences that it contains'''
+    
     cline = ClustalwCommandline("clustalw", infile='toAlign.fasta',outfile=outfile,align='true',output='PHYLIP')
     cline()
     alignment = AlignIO.parse(outfile,formata).next()
