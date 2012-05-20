@@ -180,7 +180,7 @@ def alignments_to_json(filename, fileFormat):
         temp['description'] = element.description
         temp['seq'] = str(element.seq)
         protiens.append(temp)
-    homologue["protiens"] = protiens
+    homologue["species"] = protiens
     return homologue
 
 def seq_to_dict(seq):
@@ -203,7 +203,7 @@ class jsonHomologue():
     def __init__(self, homologue):
         self.protienID = homologue["protienID"] #Metadata on search
         self.searchQuery = homologue["searchQuery"] # Query used to find homologues
-        self.alignments = homologue["protiens"] #this is the individual protien seqs
+        self.alignments = homologue["species"] #this is the individual protien seqs
         #check to make sure alignments ar same length
         #Other sanity checks should go here
         for alignment in self.alignments:
