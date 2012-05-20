@@ -98,23 +98,19 @@ def parse_clustalomeaga_string_fasta(fasta_input):
 def align(hom):
     '''Takes in a homologue from getHomologues() and
     aligns all of the sequences that it contains'''
-    with tempfile.NamedTemporaryFile() as temp_input_file:
-        uid_map = {}
-        input_str = ""
-        for species in hom['species']:
-            temp = hom['species'][species][0]
-            input_str += '>' + str(temp['uid']) + '\n'
-            input_str += temp['seq'] + '\n'
-            input_str +='\n'
-            uid_map[temp['uid']] = species
-        temp_input_file.flush()
-        temp_input_file.seek(0)
-        temp_input_file = StringIO.StringIO(input_str)
-        #Use ClustalOmega to do alignment via stdin (temp_input_file) get output
-        alignment_str = subprocess.check_output(['./clustalomega', '--infile=-'],stdin=temp_input_file)
-        temp_input_file.close()
-        #Parse our own ouput because AlignIO really sucks
-        alignments = parse_clustalomeaga_string_fasta(alignment_str)
+    uid_map = {}
+    input_str = ""
+    for species in hom['species']:
+        temp = hom['species'][species][0]
+        input_str += '>' + str(temp['uid']) + '\n'
+        input_str += temp['seq'] + '\n'
+        input_str +='\n'
+        uid_map[temp['uid']] = species
+    #Use ClustalOmega to do alignment via stdin (temp_input_file) get output
+    p = subprocess.Popen(['./clustalomega', '--infile=-'],stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    alignment_str = p.communicate(input=input_str)[0]
+    #Parse our own ouput because AlignIO really sucks
+    alignments = parse_clustalomeaga_string_fasta(alignment_str)
     for alignment in alignments:
         #Get back the proper ID
         alignment_id = uid_map[int(alignment['id'])]
