@@ -171,7 +171,7 @@ def alignments_to_json(filename, fileFormat):
     be exported to a json string'''
     alignments = AlignIO.read(open(filename), fileFormat)
     homologue = {}
-    homologue["protienID"] = alignments[0].description
+    homologue["proteinName"] = alignments[0].description
     homologue["searchQuery"] = str(alignments[0].seq)
     protiens = []
     for element in alignments:
@@ -201,7 +201,7 @@ def read_homologue_pair(pair):
 class jsonHomologue():
     '''Homologues represented by json lines'''
     def __init__(self, homologue):
-        self.protienID = homologue["protienID"] #Metadata on search
+        self.proteinName = homologue["proteinName"] #Metadata on search
         self.searchQuery = homologue["searchQuery"] # Query used to find homologues
         self.alignments = homologue["species"] #this is the individual protien seqs
         #check to make sure alignments ar same length
