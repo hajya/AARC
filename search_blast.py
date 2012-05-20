@@ -11,6 +11,7 @@ import os
 import StringIO
 import tempfile
 import json
+import subprocess
 
 E_VAL_THRESHOLD = 0.0001
 titles = {}
@@ -76,37 +77,63 @@ def getHomologues(blast_records, searchQuery):
             species_protien_list.append(temp)
     return homologue
 
+def parse_clustalomeaga_string_fasta(fasta_input):
+    '''Parses a fasta file with multiple alignments.
+    Each line that starts with ">" is used as a new
+    ID. Empty lines are ignored. Lines Between ">"
+    are considered the sequence'''
+    results = []
+    seq = ""
+    new_result = False
+    for line in fasta_input.split("\n"):
+        if line.startswith(">"):
+            new_result = {}
+            new_result['id'] = line.lstrip(">")
+            new_result['seq'] = ""
+            results.append(new_result)
+        else:
+            new_result['seq'] += line
+    return results
+
 def align(hom):
     '''Takes in a homologue from getHomologues() and
     aligns all of the sequences that it contains'''
-    with tempfile.NamedTemporaryFile() as temp_file:
+    with tempfile.NamedTemporaryFile() as temp_input_file:
         uid_map = {}
+        input_str = ""
         for species in hom['species']:
             temp = hom['species'][species][0]
-            temp_file.write('>' + str(temp['uid']) + '\n')
-            temp_file.write(temp['seq'] + '\n')
-            temp_file.write('\n')
+            input_str += '>' + str(temp['uid']) + '\n'
+            input_str += temp['seq'] + '\n'
+            input_str +='\n'
             uid_map[temp['uid']] = species
-        temp_file.flush()
-        align_io_temp_file = StringIO.StringIO()
-        cline = ClustalwCommandline("clustalw", infile=temp_file.name, align='true',output='PHYLIP')
-        align_io_temp_file.write(cline)
-        alignments = AlignIO.parse(align_io_temp_file, 'phylip')
+        temp_input_file.flush()
+        temp_input_file.seek(0)
+        temp_input_file = StringIO.StringIO(input_str)
+        #Use ClustalOmega to do alignment via stdin (temp_input_file) get output
+        alignment_str = subprocess.check_output(['./clustalomega', '--infile=-'],stdin=temp_input_file)
+        temp_input_file.close()
+        #Parse our own ouput because AlignIO really sucks
+        alignments = parse_clustalomeaga_string_fasta(alignment_str)
     for alignment in alignments:
+        #Get back the proper ID
+        alignment_id = uid_map[int(alignment['id'])]
         #TODO: Don't throw out data here
         #get the first protien for the species
-        temp = hom[uid_map[alignment.id]]['species'][0]
+        temp = hom['species'][alignment_id][0]
         #clear out all others since we only currently want one
-        hom[uid_map[alignment.id]]['species'] = []
+        hom['species'][alignment_id] = []
         #stick in the aligned sequence
-        temp['seq'] = str(alignment.seq)
+        temp['seq'] = alignment['seq']
         #re append the protien
-        hom[uid_map[alignment.id]]['species'].append(temp)
+        hom['species'][alignment_id].append(temp)
     seq_len = False
     for species in hom['species']:
         if not seq_len:
             seq_len = len(hom['species'][species][0]['seq'])
         if len(hom['species'][species][0]['seq']) != seq_len:
+            #for species in hom['species']:
+            #    print hom['species'][species][0]['seq']
             raise Exception("ALIGNMENT ERROR")
     return hom
 
