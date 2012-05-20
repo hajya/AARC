@@ -13,9 +13,9 @@ for line in sys.stdin:
         for element in temp[i+1:]:
             combinations.append([homologue, element])
     try:
-        foo = combinations[0]
-        for i in range(1,100000):
-            print str(i) + " " + json.dumps(foo)
+        #foo = combinations[0]
+        for i,combination in enumerate(combinations):
+            print str(i) + " " + json.dumps(combination)
     	    #print >> sys.stderr, "MAP:Generated output"
     except:
         print >> sys.stderr, "MAP:Didn't recive any input"
