@@ -2,6 +2,7 @@ from Bio.Blast import NCBIWWW
 from Bio import SeqIO
 from Bio.Blast import NCBIXML
 from Bio.Align.Applications import ClustalwCommandline
+from Bio.Align.Applications import ClustalOmegaCommandline
 from Bio import AlignIO
 import re
 import sys
@@ -114,9 +115,6 @@ def align(hom):
             raise Exception("ALIGNMENT ERROR")
     return hom
 
-def makeRec():
-    thelist =[]
-
 def alignments_to_json(filename, fileFormat):          #Experimental.  filename="out.phy", format="phylip"
     '''Opens a file with one alignment and converts it to a list that can
     be exported to a json string'''
@@ -140,25 +138,4 @@ if __name__ == "__main__":
     #makeXML(record)
     blast_records = parseXML()
     getHomologues(blast_records, "FILL_IN")
-    #unqList = getHomoLs(blast_records)
-    print("-------------------------")
-    print(unqList)
-    print("-------------------------")
-    #a = align(unqList)
     a = align()
-
-    '''Desired Output:  A json string of the following format...
-    A list of homologues.  Homologues are dictionaries
-
-    [ { SearchQuery: " ... "                                             #Homologue number 1
-        protiens: [ { "id":   unique-species-id
-                      "seq":  aligned-sequence-of-uniform-length
-                      "desc": " ... "
-                    },
-                    additional dictionaries for each unique-species-id...
-                  ]
-      },
-      { ... }, #Homologue number 2...
-      ...
-    ]
-    '''
