@@ -5,12 +5,15 @@ from Bio.Align.Applications import ClustalwCommandline
 from Bio import AlignIO
 import re
 import sys
+import os
+import StringIO
+import tempfile
 
 E_VAL_THRESHOLD = 0.0001
 titles = {}
 theMAINlist = []
 prots = {}
-outfile = 'out.phy'
+#outfile = 'out.phy'
 formata = 'phylip'
 
 class unique_identifier:
@@ -78,14 +81,38 @@ def getHomologues(blast_records, searchQuery):
             species_protien_list.append(temp)
     return homologue
 
-def align(homologue):
+def align(hom):
     '''Takes in a homologue from getHomologues() and
     aligns all of the sequences that it contains'''
-    
-    cline = ClustalwCommandline("clustalw", infile='toAlign.fasta',outfile=outfile,align='true',output='PHYLIP')
-    cline()
-    alignment = AlignIO.parse(outfile,formata).next()
-    return alignment
+    with tempfile.NamedTemporaryFile() as temp_file:
+        uid_map = {}
+        for species in hom['species']:
+            temp = hom['species'][species][0]
+            temp_file.write('>' + str(temp['uid']) + '\n')
+            temp_file.write(temp['seq'] + '\n')
+            temp_file.write('\n')
+            uid_map[temp['uid']] = species
+        align_io_temp_file = StringIO.StringIO()
+        cline = ClustalwCommandline("clustalw", infile=temp_file.name, align='true',output='PHYLIP')
+        align_io_temp_file.write(cline)
+        alignments = AlignIO.parse(align_io_temp_file, 'phylip')
+    for alignment in alignments:
+        #TODO: Don't throw out data here
+        #get the first protien for the species
+        temp = hom[uid_map[alignment.id]]['species'][0]
+        #clear out all others since we only currently want one
+        hom[uid_map[alignment.id]]['species'] = []
+        #stick in the aligned sequence
+        temp['seq'] = str(alignment.seq)
+        #re append the protien
+        hom[uid_map[alignment.id]]['species'].append(temp)
+    seq_len = False
+    for species in hom['species']:
+        if not seq_len:
+            seq_len = len(hom['species'][species][0]['seq'])
+        if len(hom['species'][species][0]['seq']) != seq_len:
+            raise Exception("ALIGNMENT ERROR")
+    return hom
 
 def makeRec():
     thelist =[]
@@ -112,7 +139,8 @@ if __name__ == "__main__":
     record = SeqIO.read(open("hemo.fasta"), format="fasta")
     #makeXML(record)
     blast_records = parseXML()
-    unqList = getHomoLs(blast_records)
+    getHomologues(blast_records, "FILL_IN")
+    #unqList = getHomoLs(blast_records)
     print("-------------------------")
     print(unqList)
     print("-------------------------")
