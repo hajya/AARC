@@ -57,7 +57,7 @@ def getHomologues(blast_records, searchQuery):
     species = homologue['species']
     for alignment in blast_records.alignments:
         if len(alignment.hsps) != 1: #ERROR CONDITION
-            print >> sys.stderr, "ERROR: unexpected blast results" 
+            print >> sys.stderr, "ERROR: unexpected blast results for: " + searchQuery 
             continue
         if alignment.hsps[0].expect > E_VAL_THRESHOLD:
             continue
@@ -133,28 +133,35 @@ def align(hom):
             raise Exception("ALIGNMENT ERROR")
     return hom
 
-#if __name__ == "__main__":
 if len(sys.argv) > 1:
     hom_list = []
     for filename in sys.argv[1:]:
-        #format the seq from the file
-#        print "filename is"+filename
-        record = SeqIO.read(open(filename), format="fasta")
-        #"create" the .xml file for NCBIXML
-        result_handle = NCBIWWW.qblast("blastp", "nr", record.format("fasta"))
-        with tempfile.NamedTemporaryFile() as temp_file:
-            tempstr = result_handle.read()
-            result_handle.close()
-            temp_file.write(tempstr)
-            temp_file.flush()
-            blast_records = NCBIXML.read(open(temp_file.name))
-        #temp_file.write(result_handle.read())     #Write this to a file we will immediately throw away
-#        result_handle.close()
-        #blast_records = NCBIXML.read(temp_file)    #Can't avoid using this function
-        hom = getHomologues(blast_records, "FILL_IN")
-        hom = align(hom)
-        hom_list.append(hom)
+        try:
+            try:
+                record = SeqIO.read(open(filename), format="fasta")
+            except:
+                raise Exception("ERROR reading file")
+            #"create" the .xml file for NCBIXML
+            try:
+                result_handle = NCBIWWW.qblast("blastp", "nr", record.format("fasta"))
+                with tempfile.NamedTemporaryFile() as temp_file:
+                    tempstr = result_handle.read()
+                    result_handle.close()
+                    temp_file.write(tempstr)
+                    temp_file.flush()
+                    blast_records = NCBIXML.read(open(temp_file.name))
+            except:
+                raise Exception("ERROR parsing results from blast")
+            hom = getHomologues(blast_records, record.id + "\n" + str(record.seq))
+            hom = align(hom)
+            hom_list.append(hom)
+        except Exception as undefined_error:
+            sys.stderr.write(str(undefined_error) + "\n")
+            sys.stderr.write("For File: " + filename + "\n")
+            
+        
 else:
-    pass
+    print sys.stderr >> "Reading from Standard In not supported yet"
+    exit(0)
     #read from stdin
 print json.dumps(hom_list)
