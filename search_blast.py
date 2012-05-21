@@ -36,10 +36,11 @@ def parseXML():
     b = NCBIXML.read(result_handle)  #read() is meant for a single query.  Should use parse()
     return b
 
-def getHomologues(blast_records, searchQuery):
+def getHomologues(blast_records, searchQuery, proteinName):
     '''Takes in a blast NCBIXML read and turns it into a
     homologue, returns a dictionary containing the following structure:
     {'searchQuery': <the function argument searchQuery>,
+     'protienName': <the function argument protienName>,
      'species':{ 'species-1': [{'id':'species-1', 'seq':<protien-seq-1>, 'desc':<blast-desc-1>, 'uid': 1},
                                 {'id':'species-1', 'seq':<protien-seq-2>, 'desc':<blast-desc-2>, 'uid': 2},
                                ],
@@ -52,6 +53,7 @@ def getHomologues(blast_records, searchQuery):
     global E_VAL_THRESHOLD
     global UID
     homologue = {}
+    homologue['proteinName'] = proteinName
     homologue['searchQuery'] = searchQuery
     homologue['species'] = {}
     species = homologue['species']
@@ -140,7 +142,7 @@ if len(sys.argv) > 1:
             try:
                 record = SeqIO.read(open(filename), format="fasta")
             except:
-                raise Exception("ERROR reading file")
+                sys.stderr.write("ERROR reading file: " + filename + "\n")
             #"create" the .xml file for NCBIXML
             try:
                 result_handle = NCBIWWW.qblast("blastp", "nr", record.format("fasta"))
@@ -151,13 +153,12 @@ if len(sys.argv) > 1:
                     temp_file.flush()
                     blast_records = NCBIXML.read(open(temp_file.name))
             except:
-                raise Exception("ERROR parsing results from blast")
-            hom = getHomologues(blast_records, record.id + "\n" + str(record.seq))
+                sys.stderr.write("ERROR parsing results from blast for file: " + filename + "\n")
+            hom = getHomologues(blast_records, record.id + "\n" + str(record.seq), filename)
             hom = align(hom)
             hom_list.append(hom)
         except Exception as undefined_error:
-            sys.stderr.write(str(undefined_error) + "\n")
-            sys.stderr.write("For File: " + filename + "\n")
+            raise
             
         
 else:

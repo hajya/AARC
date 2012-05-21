@@ -171,7 +171,7 @@ def alignments_to_json(filename, fileFormat):
     be exported to a json string'''
     alignments = AlignIO.read(open(filename), fileFormat)
     homologue = {}
-    homologue["proteinName"] = alignments[0].description
+    #homologue["proteinName"] = alignments[0].description
     homologue["searchQuery"] = str(alignments[0].seq)
     protiens = []
     for element in alignments:
@@ -201,28 +201,34 @@ def read_homologue_pair(pair):
 class jsonHomologue():
     '''Homologues represented by json lines'''
     def __init__(self, homologue):
-        self.proteinName = homologue["proteinName"] #Metadata on search
+        if 'proteinName' in homologue:
+            self.proteinName = homologue["proteinName"] #Metadata on search
+        else:
+            self.proteinName = "N/A"
         self.searchQuery = homologue["searchQuery"] # Query used to find homologues
         self.alignments = homologue["species"] #this is the individual protien seqs
         #check to make sure alignments ar same length
         #Other sanity checks should go here
-        for alignment in self.alignments:
-            if len(alignment) != len(self.alignments[0]):
+        first_key = False
+        for species_name in self.alignments:
+            if not first_key:
+                first_key = species_name
+            if len(self.alignments[species_name][0]['seq']) != len(self.alignments[first_key][0]['seq']):
                 raise Exception("Length of alignments didn't match")
         self.columns = []
         columns = self.columns
         self.filtered_columns = []
         self.col_height = len(self.alignments)
-        for i in range(0,len(self.alignments[0]['seq'])):
+        for i in range(0,len(self.alignments[first_key][0]['seq'])):
             columns.append({})
-        for record in self.alignments:
-            for i,letter in enumerate(record['seq']):
+        for species in self.alignments:
+            for i,letter in enumerate(self.alignments[species][0]['seq']):
                 if not letter in columns[i]:
                     columns[i][letter] = {}
                     columns[i][letter]['count'] = 0
                     columns[i][letter]['records'] = {}
                 columns[i][letter]['count'] += 1
-                columns[i][letter]['records'][record['id']] = record
+                columns[i][letter]['records'][species] = self.alignments[species][0]
 
     def get_possible_cols(self):
         cols = []
@@ -254,7 +260,11 @@ def calc_total_delta_mutation(results):
     i = 0.0
     for element in results:
         i += float(element['deltaMutationScore'])
-    return math.log(i)
+    try:
+        return math.log(i)
+    except:
+        sys.stderr.write("ERROR total delta mutation score was negative\n")
+        return -99999999999
 
 def calc_and_print_average(results, column):
     total = 0.0

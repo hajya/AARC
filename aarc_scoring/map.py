@@ -18,5 +18,6 @@ for line in sys.stdin:
             print str(i) + " " + json.dumps(combination)
     	    #print >> sys.stderr, "MAP:Generated output"
     except:
+        raise
         print >> sys.stderr, "MAP:Didn't recive any input"
         pass
