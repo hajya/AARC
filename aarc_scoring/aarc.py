@@ -173,14 +173,15 @@ def alignments_to_json(filename, fileFormat):
     homologue = {}
     #homologue["proteinName"] = alignments[0].description
     homologue["searchQuery"] = str(alignments[0].seq)
-    protiens = []
+    homologue['species'] = {}
     for element in alignments:
+        homologue['species'][element.id] = []
         temp = {}
         temp['id'] = element.id
         temp['description'] = element.description
         temp['seq'] = str(element.seq)
-        protiens.append(temp)
-    homologue["species"] = protiens
+        homologue['species'][element.id].append(temp)
+    print homologue
     return homologue
 
 def seq_to_dict(seq):
@@ -241,7 +242,16 @@ class jsonHomologue():
                 self.filtered_columns.append(column)
                 column_map.append(i)
         return (cols, column_map)
-        
+
+def get_common_species_count(A,B):
+    '''Takes in two homologues and returns the number of common species between them'''
+    count = 0
+    for key in A.alignments:
+        if key in B.alignments:
+            count += 1
+    return count
+
+    
 def filter_results(results):
     filtered_results = []
     global DELTA_MUTATION_SCORE_MINIMUM
@@ -256,15 +266,17 @@ def filter_results(results):
             filtered_results.append(element)
     return filtered_results
 
-def calc_total_delta_mutation(results):
+def calc_raw_total_delta_mutation(results):
     i = 0.0
     for element in results:
         i += float(element['deltaMutationScore'])
-    try:
-        return math.log(i)
-    except:
-        sys.stderr.write("ERROR total delta mutation score was negative\n")
-        return -99999999999
+    return i
+
+def calc_total_delta_mutation(results, A, B):
+    i = calc_raw_total_delta_mutation(results)
+    i = i * float(1000)
+    return i / float(get_common_species_count(A,B) * len(A.columns) * len(B.columns))
+    
 
 def calc_and_print_average(results, column):
     total = 0.0
@@ -286,11 +298,13 @@ def map():
 
 if __name__ == "__main__":
 
-    A = alignments_to_json('rhoa-aligned-no-predicted.fa', 'fasta')
-    B = alignments_to_json('rock-aligned-no-predicted.fa', 'fasta')
+    A = alignments_to_json('data/rhoa-aligned-no-predicted.fa', 'fasta')
+    B = alignments_to_json('data/rock-aligned-no-predicted.fa', 'fasta')
     A = jsonHomologue(A)
     B = jsonHomologue(B)
 
+    print "Number of Species common in A and B: ", get_common_species_count(A,B)
+    
     print "Number of columns in A: ", len(A.columns)
     print "Number of columns in B: ", len(B.columns)
     print "Number of Possible columns in A: ", len(A.get_possible_cols()[1])
