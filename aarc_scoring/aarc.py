@@ -12,6 +12,10 @@ MUTATION_SCORE_FILTER_THRESHOLD = 0.0 #Any point with a matrix amino acid score 
 VARIATION_AMINO_ACID_SCORE_PENALTY = 2.0 #The higher this number the more that columns with lots of variation
                                          #are penalized in their score
 
+MAX_ADD_MATRIX_SCORE = 6.0
+MIN_ADD_MATRIX_SCORE = -3.0
+
+
 def print_possible_tuple(tup):
     print_str = "["
     print_str += '\'A-Pos\': ' + str(tup['colApos']) + ', '
@@ -255,12 +259,13 @@ def get_common_species_count(A,B):
 def filter_results(results):
     filtered_results = []
     global DELTA_MUTATION_SCORE_MINIMUM
+    global MAX_ADD_MATRIX_SCORE
+    global MIN_ADD_MATRIX_SCORE
     for element in results:
+        delta_score_add = float(element['deltaAScore']) + float(element['deltaBScore'])
         if float(element['deltaMutationScore']) < DELTA_MUTATION_SCORE_MINIMUM:
             continue
-        if float(element['deltaAScore']) < MUTATION_SCORE_FILTER_THRESHOLD:
-            continue
-        if float(element['deltaBScore']) < MUTATION_SCORE_FILTER_THRESHOLD:
+        elif (delta_score_add <= MAX_ADD_MATRIX_SCORE) and (delta_score_add >= MIN_ADD_MATRIX_SCORE):
             continue
         else:
             filtered_results.append(element)
@@ -275,7 +280,9 @@ def calc_raw_total_delta_mutation(results):
 def calc_total_delta_mutation(results, A, B):
     i = calc_raw_total_delta_mutation(results)
     i = i * float(1000)
-    return i / float(get_common_species_count(A,B) * len(A.columns) * len(B.columns))
+    temp = float(min((len(A.columns), len(B.columns))))
+    #return i / float(get_common_species_count(A,B) * len(A.columns) * len(B.columns))
+    return i / float(get_common_species_count(A,B) * temp * temp)
     
 
 def calc_and_print_average(results, column):
