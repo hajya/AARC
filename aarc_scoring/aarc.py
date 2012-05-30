@@ -282,7 +282,7 @@ def calc_total_delta_mutation(results, A, B):
     i = i * float(1000)
     temp = float(min((len(A.columns), len(B.columns))))
     #return i / float(get_common_species_count(A,B) * len(A.columns) * len(B.columns))
-    return i / float(get_common_species_count(A,B) * temp * temp)
+    return (i / float(get_common_species_count(A,B) * temp * temp)) * 100.0
     
 
 def calc_and_print_average(results, column):
