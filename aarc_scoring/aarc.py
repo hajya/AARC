@@ -17,12 +17,15 @@ MIN_ADD_MATRIX_SCORE = -3.0
 
 
 def print_possible_tuple(tup):
-    print_str = "["
-    print_str += '\'A-Pos\': ' + str(tup['colApos']) + ', '
-    print_str += '\'B-Pos\': ' + str(tup['colBpos']) + ', '
-    print_str += '\'deltaAScore\': ' + str(tup['deltaAScore']) + ', '
-    print_str += '\'deltaBScore\': ' + str(tup['deltaBScore']) + ', '
-    print_str += '\'deltaMutationScore\':' + str(tup['deltaMutationScore']) + ']'
+    print_str = ""
+    print_str += str(tup['colApos']) + ","
+    print_str += str(tup['colBpos']) + ","
+    #print_str = "["
+    #print_str += '\'A-Pos\': ' + str(tup['colApos']) + ', '
+    #print_str += '\'B-Pos\': ' + str(tup['colBpos']) + ', '
+    #print_str += '\'deltaAScore\': ' + str(tup['deltaAScore']) + ', '
+    #print_str += '\'deltaBScore\': ' + str(tup['deltaBScore']) + ', '
+    #print_str += '\'deltaMutationScore\':' + str(tup['deltaMutationScore']) + ']'
     print print_str
     
 def calc_mutation_score(column, letter):
@@ -164,8 +167,9 @@ def columns_columns_combine(A, B):
 
 def filter_column(col, col_height):
     if "-" in col: #Filter out columns where there is an insertion in only a few homologues
-        if float(col["-"]["count"])/float(col_height) < LETTER_UNIQUENESS_WEIGHT:
-            return False
+        #if float(col["-"]["count"])/float(col_height) < LETTER_UNIQUENESS_WEIGHT:
+        #    return False
+        return False
     if not (float(len(col))/float(col_height) < MAX_VARIATION_RATIO and len(col) > 1):
         return False 
     return True
@@ -185,7 +189,6 @@ def alignments_to_json(filename, fileFormat):
         temp['description'] = element.description
         temp['seq'] = str(element.seq)
         homologue['species'][element.id].append(temp)
-    print homologue
     return homologue
 
 def seq_to_dict(seq):
@@ -246,6 +249,27 @@ class jsonHomologue():
                 self.filtered_columns.append(column)
                 column_map.append(i)
         return (cols, column_map)
+    def __str__(self, column_len= 80):
+        species_names = []
+        seqs = []
+        for species_name,val in self.alignments.items():
+            species_names.append(species_name)
+            seqs.append(val[0]['seq'])
+        i = 0
+        retval = self.proteinName + "\n"
+        stuff_to_print = True
+        while stuff_to_print:
+            for species_name,seq in zip(species_names, seqs):
+                retval += "%30s  " % species_name[:30]
+                if column_len < (len(seq) - i):
+                    retval += seq[i:i+column_len]
+                else:
+                    retval += seq[i:]
+                    stuff_to_print = False
+                retval += "\n"
+            i = i + column_len + 1
+            retval += "\n"
+        return retval
 
 def get_common_species_count(A,B):
     '''Takes in two homologues and returns the number of common species between them'''
@@ -283,6 +307,10 @@ def calc_total_delta_mutation(results, A, B):
     temp = float(min((len(A.columns), len(B.columns))))
     #return i / float(get_common_species_count(A,B) * len(A.columns) * len(B.columns))
     return (i / float(get_common_species_count(A,B) * temp * temp)) * 100.0
+    #try:
+    #    return math.log(i)
+    #except:
+    #    return 0.0
     
 
 def calc_and_print_average(results, column):
@@ -305,8 +333,8 @@ def map():
 
 if __name__ == "__main__":
 
-    A = alignments_to_json('data/rhoa-aligned-no-predicted.fa', 'fasta')
-    B = alignments_to_json('data/rock-aligned-no-predicted.fa', 'fasta')
+    A = alignments_to_json('data/rhoa-aligned.fa', 'fasta')
+    B = alignments_to_json('data/rock-aligned.fa', 'fasta')
     A = jsonHomologue(A)
     B = jsonHomologue(B)
 
@@ -322,17 +350,17 @@ if __name__ == "__main__":
     
     results = columns_columns_combine(A,B)
     print "Total Combinations found before filtration: ", len(results)
-    print "Total Combinations deltaMutationScore: ", calc_total_delta_mutation(results)
+    print "Total Combinations deltaMutationScore: ", calc_total_delta_mutation(results, A, B)
     print "Averages Before filtration: "
     print_averages(results)
     print "\n"
 
     filtered_results = filter_results(results)
     print "Filtered Results combinations: ", len(filtered_results)
-    print "Filtered Results deltaMutationScore: ", calc_total_delta_mutation(filtered_results)
+    print "Filtered Results deltaMutationScore: ", calc_total_delta_mutation(filtered_results, A, B)
     print "Averages After filtration: "
     print_averages(filtered_results)
-    #for element in results:
-    #    print_possible_tuple(element)
+    for element in results:
+        print_possible_tuple(element)
     #for line in filtered_results:
     #    print json.dumps(line)
