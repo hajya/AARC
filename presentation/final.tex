@@ -12,7 +12,7 @@
 James Bucher \\
 Tyler Land \\
 Kyle Mears \\
-Christina Guiterrez \\
+Christina Gutierrez \\
 Ali Hajy}
 
 \begin{center}
@@ -60,7 +60,7 @@ together as pipelines. When choosing candidate protein homologs
 an E-Value (from the blast results) of $1.0 \times 10^{-5}$ is used
 since this is the current standard for homologs from blast. Furthermore, if
 there is more than one protein returned for a species then the first
-is chosen abitrarily. This is known as a paralogue and is caused by
+is chosen arbitrarily. This is known as a paralogue and is caused by
 gene duplication in an organism where one copy of the gene starts
 specializing for one function and the other continues performing the
 same old function. This is hard to distinguish if the divergence of
@@ -137,7 +137,7 @@ acid changed from the most common amino acid to the current amino acid
 when looking up the score in the matrix. That is to say if the column
 included 12 instances of 'T' and one instance of 'A' and one instance
 of 'D' then the program would assume that both 'A' and 'D' changed
-from 'T'. If there is a tie then the choice is made abitrarily
+from 'T'. If there is a tie then the choice is made arbitrarily
 (although the column filter is designed to catch these kind of cases
 so that they don't influence the results). \\
 
@@ -198,7 +198,7 @@ Since these calculations have started taking a nontrivial amount of
 time for even 14 sample proteins (since the number of combinations is
 on the order of $N^2$ where $N$ is the number of input proteins) the
 programs are setup to run on Hadoop using the "run-hadoop.sh"
-script. When run on Hadoop a sizeable speedup should be achieved
+script. When run on Hadoop a size-able speedup should be achieved
 since the calculations are CPU bound. However given the
 amount of time that Hadoop jobs take to start this would only make
 sense for jobs that include a large number of proteins to be compared.
