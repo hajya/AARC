@@ -44,14 +44,8 @@ body {
 	color: #eee;
 
     background-image: url("../img/Aperture_Science_Background.jpg");
-	background: #1c1e20;
-	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPHJhZGlhbEdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNzUlIj4KICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM1NTVhNWYiIHN0b3Atb3BhY2l0eT0iMSIvPgogICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMWMxZTIwIiBzdG9wLW9wYWNpdHk9IjEiLz4KICA8L3JhZGlhbEdyYWRpZW50PgogIDxyZWN0IHg9Ii01MCIgeT0iLTUwIiB3aWR0aD0iMTAxIiBoZWlnaHQ9IjEwMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-	background: -moz-radial-gradient(center, ellipse cover,  rgba(85,90,95,1) 0%, rgba(28,30,32,1) 100%);
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(85,90,95,1)), color-stop(100%,rgba(28,30,32,1)));
-	background: -webkit-radial-gradient(center, ellipse cover,  rgba(85,90,95,1) 0%,rgba(28,30,32,1) 100%);
-	background: -o-radial-gradient(center, ellipse cover,  rgba(85,90,95,1) 0%,rgba(28,30,32,1) 100%);
-	background: -ms-radial-gradient(center, ellipse cover,  rgba(85,90,95,1) 0%,rgba(28,30,32,1) 100%);
-	background: radial-gradient(center, ellipse cover,  rgba(85,90,95,1) 0%,rgba(28,30,32,1) 100%);
+    background-size: 100%;
+    background-repeat: no-repeat;
 }
 
 /*********************************************
@@ -964,4 +958,7 @@ sup {
     font-size: 0.7em;
 }
 
-
+.slides {
+    background-color: rgba(19,218,236,.1);
+    border-radius: 20px;
+}

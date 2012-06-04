@@ -30,9 +30,16 @@
 			
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
-				<section>
-					<h1>Using Residue Conservation to Predict Protien Interactions</h1>
-					<h3 class="inverted">James Bucher, and others</h3>
+                <section>
+                    <h2>Aperture Laboratories Presents</h2> 
+					<h2>Using Residue Conservation to Predict Protein Interactions</h2>
+                    <h4 class="inverted">With our helpful science team:
+                        </br>
+                        James Bucher,</br>
+                        Kyle Mears,</br>
+                        Tyler Land,</br>
+                        Christina Guiterrez</br>
+                        and Ali Hijy</h4>
 				</section>
 				
                 <section>
@@ -55,7 +62,7 @@
                             <li>Use this to measure covariance between proteins</li> 
                          </ul>
                     </section>
-                    <section>
+                    <section style="font-size:.75em">
                         <h1>Our Idea</h1>
                         <h2>For 2 Proteins</h2>
                         <ul>
@@ -66,13 +73,13 @@
                         </ul>
                     </section>
                 </section>
-                <section>
+                <section style="font-size:.850em">
                     <h1>The Process</h1>
                     <ol>
-                        <li>Begin with a pair of protiens A and B</li>
-                        <li>Search blast for proteins homologues to A and B</li>
+                        <li>Begin with a pair of proteins A and B</li>
+                        <li>Search blast for proteins homologs to A and B</li>
                         <li>Align all of the homologs</li>
-                        <li>For each mutation in every protein homologues to A, form the cross product with the mutations in protiens homologues to B</li>
+                        <li>For each mutation in every protein homologs to A, form the cross product with the mutations in proteins homologs to B</li>
                         <li>Only consider pairs of mutations that belong to the same species</li>
                         <li>Score each pair of mutations</li>
                         <li>Use those scores to score protein pairs that those mutations are found on</li>
@@ -93,17 +100,17 @@
                         </li>
                     </ul>
                     </section>
-                    <section>
+                    <section style="font-size:.85em">
                         <h1>Pre-Processing</h1>
                         <ul>
                             <li>Blast returns lots of proteins</li>
                             <li>Each protein returned has an E-Val
                                 <ul>
                                     <li> The lower the E-Val the more "significant" the match is</li>
-                                    <li> Filter Out E-Val > 1x10^-5</li>
+                                    <li> Filter Out E-Val > 1x10<sup>-5</sup></li>
                                 </ul>
                             </li>
-                            <li>Remove protiens that are:
+                            <li>Remove proteins that are:
                                 <ul>
                                     <li>Predicted</li>
                                     <li>Pseudo-Gene</li>
@@ -145,7 +152,7 @@
                                     <li>Scores that are in the middle and likely random</li>
                                 </ul>
                             </li>
-                            <li>Compensate for the size of the protien
+                            <li>Compensate for the size of the protein
                                 <ul>
                                     <li>final_score = </br> <sup>(sum_of_scores x 100000)</sup>&frasl;<sub>(min(size_A,size_B)<sup>2</sup> x common_species_count)</sub></li>
                                 </ul>
@@ -197,7 +204,8 @@
                 <section>
                     <h1>Accomplished Milestones</h1>
                     <ul>
-                        <li>Biopython script that preforms BLAST searches using fasta files as input and pre-processes the data</li>
+                        <li>Biopython script that preforms BLAST searches</br>
+                        using fasta files as input and pre-processes the data</li>
                         <li>Program that scores conserved regions:
                             <ul>
                                 <li>Scales with Hadoop</li>
@@ -213,7 +221,7 @@
                     </br>
                     </br>
                     <ul>
-                        <li>Inter-protien analysis is harder than Intra-protein</li>
+                        <li>Inter-protein analysis is harder than Intra-protein</li>
                         <li>Rigorous statistical methods very useful</li>
                         <li>Which is best? Lots of considerations</li>
                     </ul> 
@@ -224,7 +232,7 @@
                     </br>
                     Most importantly: Inter-Protein Coevolution analysis is hard!
                     </section>
-                    <section>
+                    <section style="font-size:.85em">
                         <h1>Why is it so hard?</h1>
                         <a href="http://www.mendeley.com/research/a-novel-method-for-detecting-intramolecular-coevolution-adding-a-further-dimension-to-selective-constraints-analyses/">CAPS</a> paper states that many parameters should be considered.
                         </br>
@@ -237,25 +245,36 @@
                                     <li>Physiochemical amino acid properties</li>
                                 </ul>
                             </li>
-                            <li>Different protiens require different methods</li>
+                            <li>Different proteins require different methods</li>
                             <li>Our scoring system has a lot of room for improvement</li>
                         </ul>
                     </section>    
                 </section>
-                <section>
+                <section  style="font-size:.75em">
                     <h1>Future Work</h1>
                     <h3>Currently our method detects conservation over the entire protein</h3>
                     <ul>
-                        <li>A better method would detect each conserved region on the protiens</li>
-                    </ul></br>
+                        <li>A better method would detect each conserved region on the proteins</li>
+                    </ul>
+                    </br>
+                    </br>
                     <h3>More Data is needed to improve accuracy</h3>
                     <ul>
-                        <li>We want protiens that we're sure co-evolved</li>
+                        <li>We want proteins that we're sure co-evolved</li>
                         <li>How does time since divergence affect our output?</li>
                         <li>How can time best be approximated?</li>
                     </ul>
                 </section>
-
+                <section>
+                    <h3>Aperture Laboratories thanks you for your participation in this experiment </br>
+                    </br>
+                    We do what we must, because we can</h3>
+                    </br>
+                    <h4>Please remember, we are not responsible for any strange afflictions caused by your participation in today's event. 
+                        </br>
+                        </br>
+                        If you have any questions please ask our friendly science team.</h4>
+                </section>
 			</div>
 
 			<!-- The navigational controls UI -->
@@ -311,13 +330,13 @@
 				mouseWheel: true,
 
 				// Apply a 3D roll to links on hover
-				rollingLinks: true,
+				rollingLinks: false,
 
 				// UI style
 				theme: query.theme || 'default', // default/neon
 
 				// Transition style
-				transition: query.transition || 'default' // default/cube/page/concave/linear(2d)
+				transition: query.transition || 'linear' // default/cube/page/concave/linear(2d)
 			});
 
 			hljs.initHighlightingOnLoad();
