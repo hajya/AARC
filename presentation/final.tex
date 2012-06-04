@@ -245,7 +245,48 @@ Graph 1 Positions of amino acids exhibiting covariance for the proteins Rock1 an
 \textbf{Reflection}
 \end{center}
 
-This project exposed the entire group to new material. Overall, our group learned that interprotein coevolution analysis is very difficult which is why very few have succeeded in creating a program that provides accurate information. In hindsight, we would have approached the problem differently from the start by dividing the tasks evenly and with more thought into what we wanted to accomplish. The BLAST search should have been done first. Right now, our program is designed to compare two entirely different proteins but if we had more time, we would modify the program to observe individual regions and how they coevolve with another region on a different protein.  If we had more time, paralogs would be taken into because the program now does not consider the fact that it could be filtering for a version that is similar but not the actual version that binds to the substrate protein anymore.
+%This project exposed the entire group to new material. Overall, our group learned that interprotein coevolution analysis is very difficult which is why very few have succeeded in creating a program that provides accurate information. In hindsight, we would have approached the problem differently from the start by dividing the tasks evenly and with more thought into what we wanted to accomplish. The BLAST search should have been done first. Right now, our program is designed to compare two entirely different proteins but if we had more time, we would modify the program to observe individual regions and how they coevolve with another region on a different protein.  If we had more time, paralogs would be taken into because the program now does not consider the fact that it could be filtering for a version that is similar but not the actual version that binds to the substrate protein anymore.
 
+For everyone except for Kyle the idea that one could compare the
+changes in the amino acids in a protein to get an idea of how much
+they interacted was completely new. As such all of us were exposed to
+a new way of thinking that we had never experienced before. Although
+Kyle was already familiar with the Biological side of the project he
+got to learn a great deal about what the Computer Science side is
+capable of. Although our results are inconclusive at best and
+downright useless at the worst we all believe that it was a good
+project and we learned a tremendous amount. \\
 
+In retrospect it would have been good to get the BLAST search results
+sooner in the project since they were necessary to do any actual
+analysis of the proteins. Since we didn't have these as early as would
+have been desirable we had no idea what our test was actually going to
+do until it was too late to do more analysis and come up with a better
+protein scoring system. That being said we likely would not have a
+working system even if we had started with the BLAST results. \\
+
+As such there are several things that we would have liked to do in the
+next month or so of the project. First it would probably be a good
+idea to do a bit of house cleaning on the code since it got a little
+messy while we were tweaking all of the settings. \\
+
+Second it would have been really useful to try to apply the results of
+intra-protein analysis to inter-protein analysis. It is our belief
+that by using the intra-protein analysis it would be possible to
+eliminate a much larger portion of the "false positive" mutations that
+look like coevolution events but are instead just random chance. Our
+results are currently far to crude to draw any sort of conclusions
+from them. \\
+
+It would also be nice to spend some time improving the pipeline with
+an auto-grading system that would report whether or not our changes
+improved the scoring system or had no effect. This would allow us to
+make changes more quickly and would be an easy that could easily be
+finished within a month. \\
+
+Furthermore it would be interesting to run some docking simulations to
+see if any of the results that could possibly be newly discovered
+interactions actually hold any weight when simulated. If so it would
+be even more intriguing to actually carry out an experiment to confirm
+the interaction.
 \end{document}
