@@ -65,202 +65,164 @@
                             <li>Conserved regions that mutate together should also interact together</li>
                         </ul>
                     </section>
-				</section>
-				
-				<!-- Example of nested vertical slides -->
-				<section>
-					<section>
-						<h2>Vertical Slides</h2>
-						<p>
-							Slides can be nested inside of other slides,<br/>
-							try pressing <a href="#/2/1">down</a>.
-						</p>
-						<a href="#/2/1" class="image">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
-						</a>
-					</section>
-					<section>
-						<h2>Basement Level 1</h2>
-						<p>Press down or up to navigate.</p>
-					</section>
-					<section>
-						<h2>Basement Level 2</h2>
-						<p>Cornify</p>
-						<a class="test" href="http://cornify.com">
-							<img width="280" height="326" src="https://s3.amazonaws.com/hakim-static/reveal-js/cornify.gif">
-						</a>
-					</section>
-					<section>
-						<h2>Basement Level 3</h2>
-						<p>That's it, time to go back up.</p>
-						<a href="#/2" class="image">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" style="-webkit-transform: rotate(180deg);">
-						</a>
-					</section>
-				</section>
+                </section>
+                <section>
+                    <h1>The Process</h1>
+                    <ol>
+                        <li>Begin with a pair of protiens A and B</li>
+                        <li>Search blast for proteins homologues to A and B</li>
+                        <li>Align all of the homologs</li>
+                        <li>For each mutation in every protein homologues to A, form the cross product with the mutations in protiens homologues to B</li>
+                        <li>Only consider pairs of mutations that belong to the same species</li>
+                        <li>Score each pair of mutations</li>
+                        <li>Use those scores to score protein pairs that those mutations are found on</li>
+                        <li>Normalize the score</li>
+                    </ol>
+                </section>
+                <section>
+                    <section>
+                    <h1>Data</h1>
+                    <ul>
+                        <li>Start with two proteins</li>
+                        <li>For each one:
+                            <ul>
+                                <li>Do a BLAST search to get homologues</li>
+                                <li>Pre-Process them to fit our needs</li>
+                                <li>Run a multi-alignment for the proper ones</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    </section>
+                    <section>
+                        <h1>Pre-Processing</h1>
+                        <ul>
+                            <li>Blast returns lots of proteins</li>
+                            <li>Each protein returned has an E-Val
+                                <ul>
+                                    <li> The lower the E-Val the more "significant" the match is</li>
+                                    <li> Filter Out E-Val > 1x10^-5</li>
+                                </ul>
+                            </li>
+                            <li>Remove protiens that are:
+                                <ul>
+                                    <li>Predicted</li>
+                                    <li>Pseudo-Gene</li>
+                                    <li>Partial</li>
+                                    <li>Synthetic</li>
+                                </ul>
+                            </li>
+                            <li> Finally Make sure there is only one homologue per organism</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h1>Methods Place Holder</h1>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                    <h1>Results</h1>
+                    <table>
+                        <tr>
+                            <td>Interacting Scores:
+                                <ul>
+                                    <li>Mean = 19.8</li>
+                                    <li>Median = 5.4</li>
+                                    <li>Max = 76.7</li>
+                                    <li>Min = 2.1</li>
+                                </ul>
+                            </td>
+                            <td>Not Interacting Scores:
+                                <ul>
+                                    <li>Mean = 20.6</li>
+                                    <li>Median = 5.3</li>
+                                    <li>Max = 278.7</li>
+                                    <li>Min = 0</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </table>
+                    </section>
+                        
+                    <section>
+                        <img src="img/Results-1.png" width="100%"> 
+                    </section>
+                    <section>
+                        <img src="img/Results-2.png" width="100%">
+                    </section>
+                    <section>
+                        <img src="img/Results-3.png" width="100%">
+                    </section>
+                    <section>
+                        <img src="img/Results-4.png" width="100%">
+                    </section>
+                    <section>
+                        <img src="img/Results-5.png" width="100%">
+                    </section>
+                </section>
+                <section>
+                    <h1>Accomplished Milestones</h1>
+                    <ul>
+                        <li>Biopython script that preforms BLAST searches using fasta files as input and pre-processes the data</li>
+                        <li>Program that scores conserved regions:
+                            <ul>
+                                <li>Scales with Hadoop</li>
+                                <li>Scoring algorithm itself is non-trivial</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <section>
+                    <h1>Learning Experience</h1>
+                    There are many variations on scoring 
+                    </br>
+                    </br>
+                    <ul>
+                        <li>Inter-protien analysis is harder than Intra-protein</li>
+                        <li>Rigorous statistical methods very useful</li>
+                        <li>Which is best? Lots of considerations</li>
+                    </ul> 
+                    </br>
+                    </br>
+                    Kyle learned to read some python! 
+                    </br>
+                    </br>
+                    Most importantly: Inter-Protein Coevolution analysis is hard!
+                    </section>
+                    <section>
+                        <h1>Why is it so hard?</h1>
+                        <a href="http://www.mendeley.com/research/a-novel-method-for-detecting-intramolecular-coevolution-adding-a-further-dimension-to-selective-constraints-analyses/">CAPS</a> paper states that many parameters should be considered.
+                        </br>
+                        </br>
+                        <ul>
+                            <li>Time since divergence</li>
+                            <li>Biochemistry
+                                <ul>
+                                    <li>Solvent Accessibility: Is water interacting with the amino acid?</li>
+                                    <li>Physiochemical amino acid properties</li>
+                                </ul>
+                            </li>
+                            <li>Different protiens require different methods</li>
+                            <li>Our scoring system has a lot of room for improvement</li>
+                        </ul>
+                    </section>    
+                </section>
+                <section>
+                    <h1>Future Work</h1>
+                    <h3>Currently our method detects conservation over the entire protein</h3>
+                    <ul>
+                        <li>A better method would detect each conserved region on the protiens</li>
+                    </ul></br>
+                    <h3>More Data is needed to improve accuracy</h3>
+                    <ul>
+                        <li>We want protiens that we're sure co-evolved</li>
+                        <li>How does time since divergence affect our output?</li>
+                        <li>How can time best be approximated?</li>
+                    </ul>
+                </section>
 
-				<section>
-					<h2>Holistic Overview</h2>
-					<p>
-						Press <strong>ESC</strong> to enter the slide overview!
-					</p>
-				</section>
-
-				<section>
-					<h2>Works in Mobile Safari</h2>
-					<p>
-						Try it out! You can swipe through the slides pinch your way to the overview.
-					</p>
-				</section>
-
-				<section>
-					<h2>Transition Styles</h2>
-					<p>
-						You can select from different transitions, like:
-					</p>
-					<ul>
-						<li><a href="http://lab.hakim.se/reveal-js/?transition=cube">Cube</a></li>
-						<li><a href="http://lab.hakim.se/reveal-js/?transition=page">Page</a></li>
-						<li><a href="http://lab.hakim.se/reveal-js/?transition=concave">Concave</a></li>
-						<li><a href="http://lab.hakim.se/reveal-js/?transition=linear">Linear</a></li>
-					</ul>
-				</section>
-
-				<section>
-					<h2>Marvelous Unordered List</h2>
-					<ul>
-						<li>No order here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-					</ul>
-				</section>
-				
-				<section>
-					<h2>Fantastic Ordered List</h2>
-					<ol>
-						<li>One is smaller than...</li>
-						<li>Two is smaller than...</li>
-						<li>Three!</li>
-					</ol>
-				</section>
-
-				<section>
-					<section data-state="alert">
-						<h2>Global State</h2>
-						<p>
-							Set <code>data-state="something"</code> on a slide and <code>"something"</code>
-							will be added as a class to the document element when the slide is open. This let's you
-							apply broader style changes, like switching the background.
-						</p>
-						<a href="#/7/1" class="image">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
-						</a>
-					</section>
-					<section data-state="blackout">
-						<h2>"blackout"</h2>
-						<a href="#/7/2" class="image">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png">
-						</a>
-					</section>
-					<section data-state="soothe">
-						<h2>"soothe"</h2>
-						<a href="#/7/0" class="image">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" style="-webkit-transform: rotate(180deg);">
-						</a>
-					</section>
-				</section>
-
-				<section data-state="customevent">
-					<h2>Custom Events</h2>
-					<p>
-						Additionally custom events can be triggered on a per slide basis by binding to the <code>data-state</code> name.
-					</p>
-					<pre><code contenteditable style="font-size: 18px; margin-top: 20px;">Reveal.addEventListener( 'customevent', function() {
-	alert( '"customevent" has fired' );
-} );
-					</code></pre>
-				</section>
-
-				<section>
-					<h2>Clever Quotes</h2>
-					<p>
-						These guys come in two forms, inline: <q cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-						The nice thing about standards is that there are so many to choose from</q> and block:
-					</p>
-					<blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-						For years there has been a theory that millions of monkeys typing at random on millions of typewriters would 
-						reproduce the entire works of Shakespeare. The Internet has proven this theory to be untrue.
-					</blockquote>
-				</section>
-				
-				<section>
-					<h2>Pretty Code</h2>
-					<pre><code contenteditable>
-var supports3DTransforms =  document.body.style['webkitPerspective'] !== undefined || 
-				document.body.style['MozPerspective'] !== undefined ||
-				document.body.style['perspective'] !== undefined;
-
-function linkify( selector ) {
-    if( supports3DTransforms ) {
-        
-        var nodes = document.querySelectorAll( selector );
-
-        for( var i = 0, len = nodes.length; i < len; i++ ) {
-            var node = nodes[i];
-
-            if( !node.className || !node.className.match( /roll/g ) ) {
-                node.className += ' roll';
-                node.innerHTML = '<span data-title="'+ node.text +'">' + node.innerHTML + '</span>';
-            }
-        };
-    }
-}
-
-linkify( 'a' );
-					</code></pre>
-					<p>Courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
-				</section>
-				
-				<section>
-					<h2>Intergalactic Interconnections</h2>
-					<p>
-						You can link between slides internally,<br/>
-						<a href="#/2/3">like this</a>.
-					</p>
-				</section>
-
-				<section>
-					<h2>Fragmented Views</h2>
-					<p>Hit the next arrow...</p>
-					<p class="fragment">... to step through ...</p>
-					<ol>
-						<li class="fragment"><code>any type</code></li>
-						<li class="fragment"><em>of view</em></li>
-						<li class="fragment"><strong>fragments</strong></li>
-					</ol>
-				</section>
-				
-				<section>
-					<h2>Spectacular image!</h2>
-					<a class="image" href="http://hakim.se/experiments/html5/breakdom/" target="_blank">
-						<img width="320" height="412" src="https://s3.amazonaws.com/hakim-static/reveal-js/breakdom.png">
-					</a>
-				</section>
-				
-				<section>
-					<h2>Stellar Links</h2>
-					<ul>
-						<li><a href="https://github.com/hakimel/reveal.js">Source code on github</a></li>
-						<li><a href="http://hakim.se/projects/reveal-js">Read more on my site</a></li>
-						<li><a href="http://twitter.com/hakimel">Follow me on Twitter</a></li>
-					</ul>
-				</section>
-				
-				<section>
-					<h1>THE END</h1>
-					<h3 class="inverted">BY Hakim El Hattab / hakim.se</h3>
-				</section>
 			</div>
 
 			<!-- The navigational controls UI -->
